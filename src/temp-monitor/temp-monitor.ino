@@ -17,13 +17,8 @@ void setup() {
    // Begin serial communication at a baud rate of 9600.
    Serial.begin(9600);
 
-   // Double check whether the `dht` object was initialized
-   // and began communication with the sensor.
-   if (dht.begin()) {
-      Serial.println("DHT sensor started.");
-   } else {
-      Serial.println("DHT sensor failed to start.");
-   }
+   // begin communication with the sensor via the `dht` object.
+   dht.begin();
 }
 
 void loop() {
@@ -37,7 +32,7 @@ void loop() {
 
    // If `myRoomTemp` is not a number, there's no room temperature.
    // Print an error message to the serial monitor and try again immediately.
-   if (isnan(myRoomTemp {
+   if (isnan(myRoomTemp)) {
       Serial.println("No room temperature data.");
       return;
    }
