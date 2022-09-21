@@ -19,14 +19,14 @@ void loop() {
    // Calculate the temperature in degrees Celsius.
    myRoomTemp = (1.0 / (c1 + (c2 * log(R2)) + (c3 * log(R2) * log(R2) * log(R2)))) - 273.15;
 
-   // Print the value of `myRoomTemp` to the serial monitor.
-   Serial.println(myRoomTemp);
-
    // If `myRoomTemp` is not a number, there's no room temperature.
    // Print an error message to the serial monitor and try again immediately.
-   if (isnan(myRoomTemp)) {
-      Serial.println("No room temperature data.");
-      return;
+   if (myRoomTemp == -273.15) {
+      Serial.println("No data.");
+   } else {
+      // Print the value of `myRoomTemp` to the serial monitor.
+      Serial.print(myRoomTemp);
+      Serial.println(" °C");
    }
 
    // Wait 1 second before we read the next value from the sensor.
