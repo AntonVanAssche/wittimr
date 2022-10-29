@@ -49,7 +49,7 @@ html = '''
 '''
 
 def get_temp():
-    ser = serial.Serial('/dev/ttyACM0', 9600, timeout=1)
+    ser = serial.Serial('/dev/ttyACM0', 9600)
     ser.flush()
 
     while True:
