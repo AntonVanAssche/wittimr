@@ -11,10 +11,12 @@
 ## How it works
 
 ### DHT11 sensor
-A DHT11 sensor can detect two different values, the humidity and the temperature. For this small project we are only interested in the last one (the temperature).
+
+A DHT11 sensor can detect two different values, the humidity and the temperature. 
+For this small project we are only interested in the last one (the temperature).
 To read the value this sensor returns, we can use an Arduino UNO (any Arduino will do the job) this is a microcontroller that we can program so that it reads the current value of the temperature.
 
-So if we connect the pins on the sensor (`GND`, `DATA` and `VCC`) to the Arduino and the [`temp-monitor.ino`](./src/temp-monitor/temp-monitor.ino ) file, we can read the temperature in the serial monitor.
+So if we connect the pins on the sensor (`GND`, `DATA` and `VCC`) to the Arduino and the [`temp-monitor.ino`](./src/temp-monitor/temp-monitor.ino) file, we can read the temperature in the serial monitor.
 
 ### Thermistor
 
@@ -33,7 +35,7 @@ To calculate the ambient temperature in degree Celcius we can use: <code>T = (1.
 ### Compiling and uploding the code to the Arduino
 
 To compile and upload the code to the Arduino you can do the following.
-Replace `<method>` with either `dht11` or `thermistor`,  depending on the method you use to measure the temperature.
+Replace `<method>` with either `dht11` or `thermistor`, depending on the method you use to measure the temperature.
 
 **NOTE**: The commands below assume you are using an Arduino UNO. Refer to the [docs](https://arduino.github.io/arduino-cli/0.27/getting-started/) for more information.
 
@@ -45,8 +47,24 @@ $ arduino-cli upload -p /dev/ttyACM0 --fqbn arduino:avr:uno temp-monitor-<method
 
 ### Reading from the Serial Monitor
 
-Since on Linux everything is a file, we can read the serial output of the file `/dev/ttyACM0` (if it has the correct permissions [`crw-rw-rw-`](https://forum.arduino.cc/t/permission-denied-on-dev-ttyacm0/475568/4)).
-To read this file we can use Python (see the `get_temp` function in the [`temperature-app.py`](./src/temperature-app.py) file) which then prints the value in the command line. In theory we could also simply use Bash to read this, but this will make it a bit harder to do the following step. If you want to try it with Bash it should look simular to the code below.
+Since on Linux everything is a file, we can read the serial output of the file `/dev/ttyACM0`.
+But first we need to update the permissions ([`crw-rw-rw-`](https://forum.arduino.cc/t/permission-denied-on-dev-ttyacm0/475568/4)) to do so you'll have to run the command listed below. 
+We will have to do this everytime we disconnect and reconnect the Arduino to the computer.
+
+```bash
+$ sudo chmod a+rw /dev/ttyACM0
+```
+
+Alternatively, you can also add your user to the `dialout` group. 
+This way you don't need to update the permissions.
+
+```bash
+$ sudo usermod -a -G dialout $USER
+```
+
+Now that we are able to read `/dev/ttyACM0` we can use Python (see the `get_temp` function in the [`temperature-app.py`](./src/temperature-app.py) file) to read the data and then prints the value in the command line. 
+In theory we could also simply use Bash to read this, but this will make it a bit harder to do the following step. 
+If you want to try it with Bash it should look simular to the code below.
 
 ```bash
 while :; do
@@ -88,6 +106,5 @@ $ python3 temperature-app.py
 
 ## References
 
-- [Arduino – Read Serial Communication with Raspberry Pi](https://www.elithecomputerguy.com/2020/12/arduino-read-serial-communication-with-raspberry-pi/) by Eli the Computer Guy
-- [Arduino CLI Getting started](https://arduino.github.io/arduino-cli/0.27/getting-started/)
-
+-   [Arduino – Read Serial Communication with Raspberry Pi](https://www.elithecomputerguy.com/2020/12/arduino-read-serial-communication-with-raspberry-pi/) by Eli the Computer Guy
+-   [Arduino CLI Getting started](https://arduino.github.io/arduino-cli/0.27/getting-started/)
