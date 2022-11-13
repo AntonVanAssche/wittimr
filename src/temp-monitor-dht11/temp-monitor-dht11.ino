@@ -33,8 +33,7 @@ void loop() {
       Serial.println("No data.");
    } else {
       // Print the value of `myRoomTemp` to the serial monitor.
-      Serial.print(myRoomTemp);
-      Serial.println(" °C");
+      Serial.println(myRoomTemp);
    }
 
    // Wait 1 second before we read the next value from the sensor.

@@ -43,7 +43,7 @@ html = '''
    </head>
    <body>
       <h1>What Is The Temperature In My Room</h1>
-      <p>Temperature: {{ content|safe }}</p>
+      <p>Temperature: {{ content|safe }} °C</p>
    </body>
 </html>
 '''
