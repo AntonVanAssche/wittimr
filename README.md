@@ -20,19 +20,41 @@ So if we connect the pins on the sensor (`GND`, `DATA` and `VCC`) to the Arduino
 
 ### Thermistor
 
-<img src="https://images.squarespace-cdn.com/content/v1/5ab541ef70e802ff969fb817/1560975278671-VH9T4JNPSWVM7KKMQN7R/ke17ZwdGBToddI8pDm48kIqK6i8kpAv-mU8h-BPM-B9Zw-zPPgdn4jUwVcJE1ZvWQUxwkmyExglNqGp0IvTJZUJFbgE-7XRK3dMEBRBhUpwnVk7ZqrCag1uAnU7ZS_rtaprZxICTRXZ27_h5u6Sr-yiD--DDRTvrufcM8m58Xi8/ResistancevsTemperature.png" width="50%" align="right" style="padding: 10px;">
+<img src="./assets/resistance-vs-temperature.png" width="50%" align="right" style="padding: 10px;">
 
 Personally, I recommend using this method, because after a few tests, the measurements look the most accurate.
 As strange as it sounds, this could be due to my DHT11 sensor so this may be different for you.
 
-A thermistor is a variable resistor depending on the ambient temperature, therefore if we measure it's value of resistance we can determine the ambient temperature using some clever math.
-First we'll have to let the Arduino measure the voltage at a point between the thermistor and a known resistor (100KΩ in my case).
-If we know that <code>V<sub>out</sub> = V<sub>in</sub> _ (R2 \ (R1 + R2))</code> we can rearange the equation to calculate `R2` , This will result in <code>R2 = R1 _ ((V<sub>in</sub> / V<sub>out</sub>) - 1)</code>
+A thermistor is a variable resistor depending on the ambient temperature, therefore if we measure its value of resistance we can determine the ambient temperature using some clever math.
+First, we'll have to let the Arduino measure the voltage at a point between the thermistor and a known resistor (100KΩ in my case).
+If we know that $V_{\text{out}} = V_{\text{in}} \cdot \left( \frac{R_2}{R_1 + R_2} \right)$, we can rearrange the equation to calculate $R_2$. This will result in $R_2 = R_1 \cdot \left( \frac{V_{\text{in}}}{V_{\text{out}}} - 1 \right)$.
 
-When we know the value of `R2` we can calculate the ambient temperature with the following coefficients <code>c1 = 1.009249522e<sup>-03</sup>, c2 = 2.378405444e<sup>-04</sup>, c3 = 2.019202697e<sup>-07</sup></code>.
-To calculate the ambient temperature in degree Celcius we can use: <code>T = (1.0 / (c1 + (c2 _ log(R2)) + (c3 _ log(R2) _ log(R2) _ log(R2))) )) - 273.15;</code> (converting to Fahrenheit: <code>T = (T \* 9.0)/ 5.0 + 32.0</code>).
+When we know the value of $R_2$, we can calculate the ambient temperature with the following coefficients: $c_1 = 1.009249522 \times 10^{-3}$, $c_2 = 2.378405444 \times 10^{-4}$, $c_3 = 2.019202697 \times 10^{-7}$.
+To calculate the ambient temperature in degrees Celsius, we can use: $T_{\text{Celcius}} = \left( \frac{1.0}{c_1 + (c_2 \cdot \log(R_2)) + (c_3 \cdot \log(R_2) \cdot \log(R_2) \cdot \log(R_2))} \right) - 273.15$ (converting to Fahrenheit: $T = \left( \frac{T_{Celcius} \cdot 9.0}{5.0} \right) + 32.0$). This equation is also known as the [Steinhart-Hart equation](https://en.wikipedia.org/wiki/Steinhart%E2%80%93Hart_equation).
 
-### Compiling and uploding the code to the Arduino
+Here are all the formulas in one place:
+
+$$
+\begin{align}
+   R_2 &= R_1 \cdot \left( \frac{V_{\text{in}}}{V_{\text{out}}} - 1 \right) \\
+   T_{\text{Celcius}} &= \left( \frac{1.0}{c_1 + (c_2 \cdot \log(R_2)) + (c_3 \cdot \log(R_2) \cdot \log(R_2) \cdot \log(R_2))} \right) - 273.15 \\
+   T_{\text{Fahrenheit}} &= \left( \frac{T_{\text{Celcius}} \cdot 9.0}{5.0} \right) + 32.0
+\end{align}
+$$
+
+Where:
+
+-   $R_1$ is the resistance of the known resistor (100KΩ in my case)
+-   $R_2$ is the resistance of the thermistor
+-   $V_{\text{in}}$ is the voltage of the Arduino (5V)
+-   $V_{\text{out}}$ is the voltage at the point between the thermistor and the known resistor
+-   $c_1 = 1.009249522 \times 10^{-3}$
+-   $c_2 = 2.378405444 \times 10^{-4}$
+-   $c_3 = 2.019202697 \times 10^{-7}$
+-   $T_{\text{Celcius}}$ is the ambient temperature in degrees Celsius
+-   $T_{\text{Fahrenheit}}$ is the ambient temperature in degrees Fahrenheit
+
+### Compiling and uploading the code to the Arduino
 
 To compile and upload the code to the Arduino you can do the following.
 Replace `<method>` with either `dht11` or `thermistor`, depending on the method you use to measure the temperature.
@@ -56,7 +78,7 @@ $ sudo chmod a+rw /dev/ttyACM0
 ```
 
 Alternatively, you can also add your user to the `dialout` group.
-This way you don't need to update the permissions.
+This way you don't need to update the permissions everytime you plug in the Arduino.
 
 ```console
 $ sudo usermod -a -G dialout $USER
