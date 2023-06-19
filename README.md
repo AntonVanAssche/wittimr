@@ -16,7 +16,7 @@ A DHT11 sensor can detect two different values, the humidity and the temperature
 For this small project we are only interested in the last one (the temperature).
 To read the value this sensor returns, we can use an Arduino UNO (any Arduino will do the job) this is a microcontroller that we can program so that it reads the current value of the temperature.
 
-So if we connect the pins on the sensor (`GND`, `DATA` and `VCC`) to the Arduino and the [`temp-monitor.ino`](./src/temp-monitor/temp-monitor.ino) file, we can read the temperature in the serial monitor.
+So if we connect the pins on the sensor (`GND`, `DATA` and `VCC`) to the Arduino and the [`temp-monitor-dht11.ino`](./src/temp-monitor/temp-monitor-dht11.ino) file, we can read the temperature in the serial monitor.
 
 ### Thermistor
 
@@ -84,7 +84,7 @@ This way you don't need to update the permissions everytime you plug in the Ardu
 $ sudo usermod -a -G dialout $USER
 ```
 
-Now that we are able to read `/dev/ttyACM0` we can use Python (see the `get_temp` function in the [`main.py`](./src/main.py) file) to read the data and then prints the value in the command line.
+Now that we are able to read `/dev/ttyACM0` we can use Python (see the `get_temp` function in the [`app.py`](./src/app.py) file) to read the data and then prints the value in the command line.
 In theory we could also simply use Bash to read this, but this will make it a bit harder to do the following step.
 If you want to try it with Bash it should look simular to the code below.
 
@@ -113,7 +113,7 @@ Since Flask won't refresh the data on its own, we have to do a little bit of mag
 To start the web server you can do the following, assuming your current working directory is still the `src` directory.
 
 ```console
-$ python3 main.py
+$ python3 app.py
 ```
 
 ### LCD Display (Optional)
