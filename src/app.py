@@ -1,18 +1,32 @@
 #!/usr/bin/env python3
 
-from flask import Flask
-import serial
-app = Flask(__name__)
+import threading
 
-html = '''
+import serial
+from flask import Flask, render_template_string
+from flask_socketio import SocketIO
+
+app = Flask(__name__)
+app.wsgi_app = ProxyFix(app.wsgi_app)
+socketio = SocketIO(app)
+
+html = """
 <!DOCTYPE html>
 <html lang="en">
     <head>
         <meta charset="UTF-8" />
         <meta http-equiv="X-UA-Compatible" content="IE=edge" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <meta http-equiv="refresh" content="1" />
         <title>What Is The Temperature In My Room</title>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/3.1.3/socket.io.js"></script>
+        <script type="text/javascript">
+            let protocol = (window.location.protocol === 'https:') ? 'wss' : 'ws';
+            let socket = io.connect(protocol + '://' + document.domain + ':' + location.port);
+
+            function updateTemperature(data) {
+                document.getElementById('temperature').innerText = data + ' °C';
+            }
+        </script>
         <style>
             * {
                 margin: 0;
@@ -43,24 +57,35 @@ html = '''
     </head>
     <body>
         <h1>What Is The Temperature In My Room</h1>
-        <p>Temperature: {{ content|safe }} °C</p>
+        <p>Temperature: <span id="temperature">Loading...</span></p>
     </body>
 </html>
-'''
+"""
 
-def get_temp():
-    ser = serial.Serial('/dev/ttyACM0', 9600)
+
+def get_temperature():
+    ser = serial.Serial("/dev/ttyACM0", 9600)
     ser.flush()
 
     while True:
         if ser.in_waiting > 0:
-            line = ser.readline().decode('utf-8').rstrip()
+            line = ser.readline().decode("utf-8").rstrip()
             return line
 
-@app.route('/')
+
+@app.route("/")
 def home():
-    return html.replace('{{ content|safe }}', str(get_temp()))
+    return render_template_string(html)
 
-if __name__ == '__main__':
-    app.run()
 
+@socketio.on("connect")
+def handle_connect():
+    socketio.emit("temperature_update", get_temperature())
+
+
+if __name__ == "__main__":
+    thread = threading.Thread(target=read_temperature)
+    thread.daemon = True  # Ensure it closes when the app stops
+    thread.start()
+
+    socketio.run(app, host="0.0.0.0", port=5000)
